@@ -4,7 +4,7 @@ FROM php:8.2-apache
 RUN a2enmod rewrite
 
 # Copy application files
-COPY . /var/html/
+COPY . /var/www/html/
 
 # Set working directory
 WORKDIR /var/html/
