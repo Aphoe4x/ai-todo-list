@@ -1,10 +1,10 @@
 services:
   - type: web
     name: ai-todo-list
-    env: php
+    env: docker
     plan: free
     buildCommand: ""
-    startCommand: "php -S 0.0.0.0:$PORT -t ."
+    startCommand: "apache2-foreground"
     healthCheckPath: /
     envVars:
       - key: DB_HOST
