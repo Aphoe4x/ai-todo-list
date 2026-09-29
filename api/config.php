@@ -17,6 +17,25 @@ try {
     die(json_encode(['error' => 'Database connection failed: ' . $e->getMessage()]));
 }
 
+// Auto-create table if not exists
+try {
+    $conn->exec("
+        CREATE TABLE IF NOT EXISTS todos (
+            id SERIAL PRIMARY KEY,
+            title VARCHAR(255) NOT NULL,
+            description TEXT,
+            priority VARCHAR(20) DEFAULT 'medium',
+            \"dueDate\" DATE,
+            status VARCHAR(20) DEFAULT 'backlog',
+            \"timerDate\" DATE,
+            completed SMALLINT DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ");
+} catch (PDOException $e) {
+    // Table creation failed
+}
+
 // Headers for API responses
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
