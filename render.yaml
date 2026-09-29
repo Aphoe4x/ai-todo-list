@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: ai-todo-list
+    env: php
+    plan: free
+    buildCommand: ""
+    startCommand: "php -S 0.0.0.0:$PORT -t ."
+    healthCheckPath: /
+    envVars:
+      - key: DB_HOST
+        fromDatabase:
+          name: ai-todo-list-db
+          property: host
+      - key: DB_USER
+        fromDatabase:
+          name: ai-todo-list-db
+          property: user
+      - key: DB_PASS
+        fromDatabase:
+          name: ai-todo-list-db
+          property: password
+      - key: DB_NAME
+        fromDatabase:
+          name: ai-todo-list-db
+          property: database
+
+databases:
+  - name: ai-todo-list-db
+    plan: free
+    databaseName: ai_todo_list
+    user: todo_user

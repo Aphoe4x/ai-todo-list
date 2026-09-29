@@ -1,9 +1,9 @@
 <?php
 // Database configuration
-$db_host = 'localhost';
-$db_user = 'root';
-$db_pass = '';  // XAMPP default is empty password
-$db_name = 'ai_todo_list';
+$db_host = getenv('DB_HOST') ?: 'localhost';
+$db_user = getenv('DB_USER') ?: 'root';
+$db_pass = getenv('DB_PASS') ?: '';
+$db_name = getenv('DB_NAME') ?: 'ai_todo_list';
 
 // Create connection
 $conn = new mysqli($db_host, $db_user, $db_pass, $db_name);
