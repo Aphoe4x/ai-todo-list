@@ -3,8 +3,6 @@ services:
     name: ai-todo-list
     env: docker
     plan: free
-    buildCommand: ""
-    startCommand: "apache2-foreground"
     healthCheckPath: /
     envVars:
       - key: DB_HOST
