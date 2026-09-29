@@ -8,7 +8,7 @@ A simple todo list application with a PHP/MySQL backend and vanilla JavaScript f
 
 - **Frontend:** Vanilla JavaScript, CSS3, Font Awesome 6.4
 - **Backend:** PHP 8.2
-- **Database:** MySQL (XAMPP)
+- **Database:** PostgreSQL (Render) / MySQL (local XAMPP)
 - **Server:** Apache 2.4 (XAMPP)
 
 ## File Structure
@@ -21,7 +21,7 @@ ai-todo-list/
 ├── js/
 │   └── app.js         # All frontend logic
 ├── api/
-│   ├── config.php     # Database connection + CORS headers
+│   ├── config.php     # PDO connection (PostgreSQL) + auto-migration + CORS headers
 │   ├── addTodo.php    # POST - Create a new todo
 │   ├── getTodos.php   # GET - Fetch all todos
 │   ├── updateTodo.php # POST - Update a todo (text, completed, priority, etc.)
@@ -32,15 +32,15 @@ ai-todo-list/
 ## Database Schema
 
 ```sql
-CREATE TABLE todos (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS todos (
+    id SERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     description TEXT,
     priority VARCHAR(20) DEFAULT 'medium',
-    dueDate DATE,
+    "dueDate" DATE,
     status VARCHAR(20) DEFAULT 'backlog',
-    timerDate DATE,
-    completed TINYINT(1) DEFAULT 0,
+    "timerDate" DATE,
+    completed SMALLINT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 ```
@@ -182,7 +182,9 @@ Expected: `{"success":true,"id":1,"message":"Todo deleted successfully"}`
 | JSON body truncated (Content-Length too small) | Use `echo` pipe in PowerShell, not `-d` directly |
 | Database table missing columns | Run the schema SQL above |
 | CORS errors | Check headers in `api/config.php` |
-| Stale data in responses | MySQL query cache — wait a second and retry |
+| `Undefined table: todos` | Auto-migration runs on first request — wait and retry |
+| `Connection refused` | Database not linked in Render — check Blueprint envVars |
+| `mysqli not found` | Use PDO/pgsql, not MySQLi (Render uses PostgreSQL) |
 | `Unknown column` errors | Database schema out of sync with API — recreate table |
 
 ## Production Deployment
