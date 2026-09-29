@@ -27,3 +27,4 @@ databases:
     plan: free
     databaseName: ai_todo_list
     user: todo_user
+    engine: mysql
