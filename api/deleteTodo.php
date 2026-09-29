@@ -1,7 +1,6 @@
 <?php
 require 'config.php';
 
-// Get POST data
 $data = json_decode(file_get_contents('php://input'), true);
 
 if (!isset($data['id'])) {
@@ -12,27 +11,17 @@ if (!isset($data['id'])) {
 
 $id = (int)$data['id'];
 
-// Delete todo
-$stmt = $conn->prepare("DELETE FROM todos WHERE id = ?");
+try {
+    $stmt = $conn->prepare("DELETE FROM todos WHERE id = ?");
+    $stmt->execute([$id]);
 
-if (!$stmt) {
-    http_response_code(500);
-    echo json_encode(['error' => $conn->error, 'success' => false]);
-    exit;
-}
-
-$stmt->bind_param('i', $id);
-
-if ($stmt->execute()) {
     echo json_encode([
         'success' => true,
         'id' => $id,
         'message' => 'Todo deleted successfully'
     ]);
-} else {
+} catch (PDOException $e) {
     http_response_code(500);
-    echo json_encode(['error' => $stmt->error, 'success' => false]);
+    echo json_encode(['error' => $e->getMessage(), 'success' => false]);
 }
-
-$stmt->close();
 ?>

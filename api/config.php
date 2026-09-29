@@ -4,17 +4,18 @@ $db_host = getenv('DB_HOST') ?: 'localhost';
 $db_user = getenv('DB_USER') ?: 'root';
 $db_pass = getenv('DB_PASS') ?: '';
 $db_name = getenv('DB_NAME') ?: 'ai_todo_list';
+$db_port = getenv('DB_PORT') ?: '5432';
 
-// Create connection
-$conn = new mysqli($db_host, $db_user, $db_pass, $db_name);
-
-// Check connection
-if ($conn->connect_error) {
-    die(json_encode(['error' => 'Database connection failed: ' . $conn->connect_error]));
+// Create PDO connection (PostgreSQL)
+try {
+    $dsn = "pgsql:host=$db_host;port=$db_port;dbname=$db_name";
+    $conn = new PDO($dsn, $db_user, $db_pass, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+    ]);
+} catch (PDOException $e) {
+    die(json_encode(['error' => 'Database connection failed: ' . $e->getMessage()]));
 }
-
-// Set charset
-$conn->set_charset("utf8");
 
 // Headers for API responses
 header('Content-Type: application/json');

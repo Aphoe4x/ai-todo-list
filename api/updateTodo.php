@@ -1,7 +1,6 @@
 <?php
 require 'config.php';
 
-// Get POST data
 $data = json_decode(file_get_contents('php://input'), true);
 
 if (!isset($data['id']) || !isset($data['text'])) {
@@ -13,36 +12,26 @@ if (!isset($data['id']) || !isset($data['text'])) {
 $id = (int)$data['id'];
 $text = $data['text'];
 $priority = $data['priority'] ?? 'medium';
-$dueDate = !empty($data['dueDate']) ? $data['dueDate'] : NULL;
-$timerDate = !empty($data['timerDate']) ? $data['timerDate'] : NULL;
+$dueDate = !empty($data['dueDate']) ? $data['dueDate'] : null;
+$timerDate = !empty($data['timerDate']) ? $data['timerDate'] : null;
 $status = $data['status'] ?? 'backlog';
 $completed = isset($data['completed']) ? (int)$data['completed'] : 0;
 
-// Update todo
-$stmt = $conn->prepare("
-    UPDATE todos 
-    SET title = ?, priority = ?, dueDate = ?, status = ?, timerDate = ?, completed = ?
-    WHERE id = ?
-");
+try {
+    $stmt = $conn->prepare("
+        UPDATE todos 
+        SET title = ?, priority = ?, \"dueDate\" = ?, status = ?, \"timerDate\" = ?, completed = ?
+        WHERE id = ?
+    ");
+    $stmt->execute([$text, $priority, $dueDate, $status, $timerDate, $completed, $id]);
 
-if (!$stmt) {
-    http_response_code(500);
-    echo json_encode(['error' => $conn->error, 'success' => false]);
-    exit;
-}
-
-$stmt->bind_param('sssssii', $text, $priority, $dueDate, $status, $timerDate, $completed, $id);
-
-if ($stmt->execute()) {
     echo json_encode([
         'success' => true,
         'id' => $id,
         'message' => 'Todo updated successfully'
     ]);
-} else {
+} catch (PDOException $e) {
     http_response_code(500);
-    echo json_encode(['error' => $stmt->error, 'success' => false]);
+    echo json_encode(['error' => $e->getMessage(), 'success' => false]);
 }
-
-$stmt->close();
 ?>
